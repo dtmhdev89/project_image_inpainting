@@ -25,3 +25,5 @@ class SimpleUnet(nn.Module):
         # x ( batch_size, c=1, h, w)
         x = self.encoder(x)
         x = self.decoder(x)
+
+        return x
