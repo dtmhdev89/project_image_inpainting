@@ -6,7 +6,13 @@ class PropertyInjectorMeta(type):
         allowed_attrs = dct.get("ALLOWED_ATTRS", [])
 
         def make_property(attr_name):
-            return property(lambda self: getattr(self, f"_{attr_name}"))
+            def getter(self):
+                return getattr(self, f"_{attr_name}")
+
+            def setter(self, value):
+                setattr(self, f"_{attr_name}", value)
+
+            return property(getter, setter)
 
         for attr in allowed_attrs:
             dct[attr] = make_property(attr)
@@ -27,8 +33,9 @@ class TrainConfiguration(nn.Module, metaclass=PropertyInjectorMeta):
         self,
         model,
         optimizer,
-        criterion,
-        num_epochs
+        num_epochs,
+        criterion=None,
+        trainloader=None
     ) -> None:
         super(TrainConfiguration, self).__init__()
 
@@ -36,3 +43,4 @@ class TrainConfiguration(nn.Module, metaclass=PropertyInjectorMeta):
         self._optimizer = optimizer
         self._criterion = criterion
         self._num_epochs = num_epochs
+        self._trainloader = trainloader
